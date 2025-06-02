@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Простой Переводчик</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Переводчик</h1>
+        
+        <!-- Поле для ввода текста -->
+        <textarea id="inputText" placeholder="Введите текст для перевода..."></textarea>
+    
+        <!-- Кнопки выбора языка -->
+        <div class="language-selector">
+            <select id="sourceLanguage">
+                <option value="en">Английский</option>
+                <option value="ru">Русский</option>
+                <option value="es">Испанский</option>
+                <option value="fr">Французский</option>
+                <option value="de">Немецкий</option>
+            </select>
+
+            <select id="targetLanguage">
+                <option value="ru">Русский</option>
+                <option value="en">Английский</option>
+                <option value="es">Испанский</option>
+                <option value="fr">Французский</option>
+                <option value="de">Немецкий</option>
+            </select>
+        </div>
+        
+        <!-- Кнопка перевода -->
+        <button id="translateBtn">Перевести</button>
+        
+        <!-- Блок с результатом -->
+        <div id="outputText"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
