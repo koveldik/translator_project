@@ -1,17 +1,58 @@
+const HISTORY_KEY = 'translationHistory';
+const HISTORY_LIMIT = 20;
+
+const outputTextEl = document.getElementById('outputText');
+const historyListEl = document.getElementById('historyList');
+
+function loadHistory() {
+    try {
+        return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    } catch {
+        return [];
+    }
+}
+
+function saveHistory(history) {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
+
+function renderHistory(history) {
+    historyListEl.innerHTML = '';
+
+    if (!history.length) {
+        const empty = document.createElement('li');
+        empty.textContent = 'История пока пуста';
+        historyListEl.appendChild(empty);
+        return;
+    }
+
+    history.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${item.from} → ${item.to}</strong>: ${item.source} → ${item.result}`;
+        historyListEl.appendChild(li);
+    });
+}
+
+function addToHistory(entry) {
+    const history = loadHistory();
+    history.unshift(entry);
+    const trimmed = history.slice(0, HISTORY_LIMIT);
+    saveHistory(trimmed);
+    renderHistory(trimmed);
+}
+
 document.getElementById('translateBtn').addEventListener('click', async () => {
     const inputText = document.getElementById('inputText').value;
     const sourceLang = document.getElementById('sourceLanguage').value;
     const targetLang = document.getElementById('targetLanguage').value;
-    const outputText = document.getElementById('outputText');
 
     if (!inputText.trim()) {
-        outputText.textContent = 'Введите текст!';
+        outputTextEl.textContent = 'Введите текст!';
         return;
     }
 
-    // Показываем загрузку
-    outputText.textContent = 'Перевожу...';
-    outputText.classList.add('loading');
+    outputTextEl.textContent = 'Перевожу...';
+    outputTextEl.classList.add('loading');
 
     try {
         const response = await fetch(
@@ -21,15 +62,26 @@ document.getElementById('translateBtn').addEventListener('click', async () => {
         const data = await response.json();
         
         if (data.responseStatus === 200) {
-            outputText.textContent = data.responseData.translatedText;
+            const translated = data.responseData.translatedText;
+            outputTextEl.textContent = translated;
+            addToHistory({
+                source: inputText,
+                result: translated,
+                from: sourceLang,
+                to: targetLang,
+                time: Date.now()
+            });
         } else {
-            outputText.textContent = 'Ошибка перевода 😢';
+            outputTextEl.textContent = 'Ошибка перевода 😢';
         }
 
     } catch (error) {
-        outputText.textContent = 'Ошибка сети!';
+        outputTextEl.textContent = 'Ошибка сети!';
         console.error(error);
     } finally {
-        outputText.classList.remove('loading');
+        outputTextEl.classList.remove('loading');
     }
 });
+
+// Показываем историю при загрузке
+renderHistory(loadHistory());
